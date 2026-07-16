@@ -1,0 +1,43 @@
+[
+  {
+    "Sender": "h\u1EA3i",
+    "SelectedFoods": [
+      "B\u00E1nh tr\u00E1ng tr\u1ED9n"
+    ],
+    "Timestamp": "2026-07-16T01:44:45.0432348\u002B00:00",
+    "Source": "birthday-food-picker"
+  },
+  {
+    "Sender": "h\u1EA3i",
+    "SelectedFoods": [
+      "B\u00E1nh tr\u00E1ng tr\u1ED9n"
+    ],
+    "Timestamp": "2026-07-16T01:47:26.7661321\u002B00:00",
+    "Source": "birthday-food-picker"
+  },
+  {
+    "Sender": "lan",
+    "SelectedFoods": [
+      "B\u00E1nh tr\u00E1ng tr\u1ED9n",
+      "Tr\u00E0 s\u1EEFa"
+    ],
+    "Timestamp": "2026-07-16T01:51:15.1670494\u002B00:00",
+    "Source": "birthday-food-picker"
+  },
+  {
+    "Sender": "huy",
+    "SelectedFoods": [
+      "B\u00E1nh tr\u00E1ng tr\u1ED9n"
+    ],
+    "Timestamp": "2026-07-16T01:54:33.7292867\u002B00:00",
+    "Source": "birthday-food-picker"
+  },
+  {
+    "Sender": "k",
+    "SelectedFoods": [
+      "B\u00E1nh tr\u00E1ng tr\u1ED9n"
+    ],
+    "Timestamp": "2026-07-16T02:05:31.4775568\u002B00:00",
+    "Source": "birthday-food-picker"
+  }
+]

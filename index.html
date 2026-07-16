@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Survey page</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="card">
+        <p class="eyebrow">Survey page</p>
+        <h1>Bạn muốn ăn gì cho buổi sinh nhật này?</h1>
+        <p class="subtitle">
+          Chọn những món yêu thích của bạn hoặc thêm món mới bằng dấu cộng.
+        </p>
+        <form id="choiceForm" novalidate>
+          <div class="options-wrapper" id="optionsWrapper" aria-label="Lựa chọn món ăn">
+            <div class="options-grid">
+              <button type="button" class="option-chip" data-value="Kem">Kem</button>
+              <button type="button" class="option-chip" data-value="Bánh tráng trộn">Bánh tráng trộn</button>
+              <button type="button" class="option-chip" data-value="Trà sữa">Trà sữa</button>
+              <button type="button" class="option-chip" data-value="Phở">Phở</button>
+              <button type="button" class="option-chip" data-value="Gà rán">Gà rán</button>
+              <button type="button" class="option-chip add-chip" id="addCustomOptionButton" aria-label="Thêm món mới">
+                <span class="plus-sign">+</span>
+              </button>
+            </div>
+            <div class="custom-option-row" id="customOptionRow" hidden>
+              <input
+                id="customOptionInput"
+                type="text"
+                class="custom-input"
+                placeholder="Hãy nhập món ăn bạn muốn nhé"
+                maxlength="40"
+              />
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="contactInfo">Tên người gửi (nếu có)</label>
+            <input id="contactInfo" name="contactInfo" type="text" placeholder="Ví dụ: Lan, Huy, hoặc tên bạn" />
+          </div>
+          <!-- Honeypot: hidden from sighted users via CSS AND hidden from assistive
+               tech via aria-hidden, so screen-reader users can never stumble into it. -->
+          <div class="honeypot-field" aria-hidden="true">
+            <label for="website">Đừng điền mục này</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+          <button id="submitButton" type="submit" class="submit-button">
+            <span class="button-text">Gửi lựa chọn</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+          <p id="message" class="message" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,28 +1,70 @@
+// ============================================================
+// BACKEND CHO TRANG KHẢO SÁT "Ăn gì cho sinh nhật"
+// Dán toàn bộ file này vào Google Apps Script (Extensions > Apps Script)
+// của 1 Google Sheet. Xem hướng dẫn deploy ở cuối chat.
+// ============================================================
+
+const SHEET_NAME = 'Submissions';
+
+// Được gọi khi trang khảo sát (script.js) POST dữ liệu lên.
 function doPost(e) {
   try {
-    const payload = JSON.parse(e.postData.contents || "{}");
-    const spreadsheetUrl =
-      "https://docs.google.com/spreadsheets/d/1HV1DM5KaLyVU4r5BE2Xl5-4MaOUVW75MMEKGX1xpPLo/edit?usp=sharing";
-    const spreadsheet = SpreadsheetApp.openByUrl(spreadsheetUrl);
-    const sheet = spreadsheet.getSheets()[0];
+    const data = JSON.parse(e.postData.contents);
 
-    const row = [
-      payload.sender || "",
-      Array.isArray(payload.selectedFoods)
-        ? payload.selectedFoods.join(", ")
-        : "",
-      payload.timestamp || new Date().toISOString(),
-      payload.source || "",
-    ];
+    if (!Array.isArray(data.selectedFoods) || data.selectedFoods.length === 0) {
+      return jsonResponse_({ ok: false, message: 'Thiếu món ăn được chọn.' });
+    }
 
-    sheet.appendRow(row);
+    const sheet = getSheet_();
+    sheet.appendRow([
+      new Date(),                          // thời điểm server ghi nhận
+      String(data.sender || ''),
+      data.selectedFoods.join(', '),
+      String(data.timestamp || ''),
+      String(data.source || '')
+    ]);
 
-    return ContentService.createTextOutput(
-      JSON.stringify({ status: "success" }),
-    ).setMimeType(ContentService.MimeType.JSON);
-  } catch (error) {
-    return ContentService.createTextOutput(
-      JSON.stringify({ status: "error", message: error.message }),
-    ).setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse_({
+      ok: true,
+      message: `Đã ghi nhận lựa chọn của ${data.sender || 'bạn'}!`
+    });
+  } catch (err) {
+    return jsonResponse_({ ok: false, message: 'Không thể lưu dữ liệu: ' + err.message });
   }
+}
+
+// Được gọi khi trang kết quả (results.html) GET dữ liệu về.
+function doGet(e) {
+  const sheet = getSheet_();
+  const values = sheet.getDataRange().getValues();
+
+  // Bỏ dòng header (dòng đầu tiên), map các dòng còn lại thành JSON
+  const rows = values.slice(1).map(function (row) {
+    return {
+      sender: row[1],
+      selectedFoods: row[2] ? String(row[2]).split(', ') : [],
+      timestamp: row[3],
+      source: row[4]
+    };
+  });
+
+  return jsonResponse_(rows);
+}
+
+// Lấy sheet "Submissions", tự tạo mới kèm header nếu chưa có.
+function getSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+    sheet.appendRow(['Ghi nhận lúc', 'Người gửi', 'Món đã chọn', 'Timestamp từ trình duyệt', 'Nguồn']);
+  }
+  return sheet;
+}
+
+// Apps Script Web App luôn trả HTTP 200, nên mọi thành công/thất bại
+// được thể hiện qua trường "ok" trong JSON, chứ không qua status code.
+function jsonResponse_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
