@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Birthday Food Results</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4fbf9;
+        margin: 0;
+        padding: 24px;
+      }
+      .container {
+        max-width: 900px;
+        margin: auto;
+        background: #fff;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th, td {
+        border: 1px solid #d8ebe3;
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background: #e1f5ee;
+      }
+      h1 {
+        color: #417b63;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Danh sách món đã được chọn</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Người gửi</th>
+            <th>Món đã chọn</th>
+            <th>Thời gian</th>
+            <th>Nguồn</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
+
+    <script>
+      async function loadResults() {
+        const resultUrl = window.location.protocol === 'file:'
+          ? 'http://localhost:5001/results'
+          : '/results';
+        const response = await fetch(resultUrl);
+        const rows = await response.json();
+        const tbody = document.getElementById('resultsBody');
+
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="4">Chưa có dữ liệu nào.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = rows.map((row) => `
+          <tr>
+            <td>${row.sender || 'Không có tên'}</td>
+            <td>${row.selectedFoods?.join(', ') || ''}</td>
+            <td>${row.timestamp || ''}</td>
+            <td>${row.source || ''}</td>
+          </tr>
+        `).join('');
+      }
+
+      loadResults();
+    </script>
+  </body>
+</html>
