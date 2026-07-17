@@ -143,6 +143,18 @@ form.addEventListener('submit', async (event) => {
       body: JSON.stringify(payload)
     });
 
+    // ==== DEBUG TẠM THỜI — XÓA SAU KHI TÌM RA LỖI ====
+    // In ra chính xác những gì server trả về, để xem trên điện thoại
+    // (vì điện thoại không mở được DevTools như máy tính).
+    const rawText = await response.clone().text();
+    alert(
+      'DEBUG\n' +
+      'HTTP status: ' + response.status + '\n' +
+      'response.url: ' + response.url + '\n' +
+      'Raw body (200 ký tự đầu):\n' + rawText.slice(0, 200)
+    );
+    // ==== HẾT PHẦN DEBUG ====
+
     const result = await response.json().catch(() => ({}));
 
     // Apps Script luôn trả HTTP 200 dù thành công hay lỗi, nên không
@@ -158,6 +170,7 @@ form.addEventListener('submit', async (event) => {
     // happens after resetFormState has already cleared the old selections.
     pageShell.classList.add('success');
   } catch (error) {
+    alert('DEBUG - Lỗi bắt được: ' + error.name + ': ' + error.message);
     showError(error.message || 'Không thể gửi dữ liệu lúc này. Vui lòng thử lại sau.');
   } finally {
     stopLoading();
