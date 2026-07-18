@@ -98,8 +98,11 @@ customOptionInput.addEventListener('keydown', (event) => {
   setTimeout(() => chip.classList.remove('pulse'), 180);
 });
 
-// Endpoint dùng cho gửi (POST) và xem kết quả (GET) cục bộ trên server Node.js / Express
-const SUBMIT_URL = '/submit';
+// URL Web App Google Apps Script — endpoint DUY NHẤT dùng cho cả gửi (POST)
+// và xem kết quả (GET). GitHub Pages không chạy được backend (/submit,
+// /results kiểu Express sẽ luôn 404 trên GitHub Pages vì đó chỉ là static
+// hosting), nên bắt buộc phải gọi thẳng ra Apps Script.
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygW8cFzc7_655aOj9cHiSjSp2j9n_blOGRLTsM30di_YZIQksuOwiq0lO34osnXoqd/exec';
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -126,17 +129,36 @@ form.addEventListener('submit', async (event) => {
   };
 
   try {
-    const response = await fetch(SUBMIT_URL, {
+    const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
+      // Dùng 'text/plain' thay vì 'application/json' để trình duyệt
+      // không gửi kèm request "preflight" (OPTIONS) — Apps Script không
+      // xử lý được preflight đó, sẽ luôn gây lỗi network nếu để
+      // 'application/json'. Apps Script vẫn JSON.parse() được body bình
+      // thường dù Content-Type khai báo là text/plain.
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'text/plain;charset=utf-8'
       },
       body: JSON.stringify(payload)
     });
 
+    // ==== DEBUG TẠM THỜI — XÓA SAU KHI TÌM RA LỖI ====
+    const rawText = await response.clone().text();
+    alert(
+      'DEBUG\n' +
+      'HTTP status: ' + response.status + '\n' +
+      'response.url: ' + response.url + '\n' +
+      'User agent: ' + navigator.userAgent + '\n' +
+      'Raw body (200 ký tự đầu):\n' + rawText.slice(0, 200)
+    );
+    // ==== HẾT PHẦN DEBUG ====
+
     const result = await response.json().catch(() => ({}));
 
-    if (!response.ok) {
+    // Apps Script luôn trả HTTP 200 dù thành công hay lỗi, nên không
+    // dùng response.ok để biết kết quả — phải đọc field "ok" trong JSON
+    // mà AppsScript.gs trả về.
+    if (!result.ok) {
       throw new Error(result.message || 'Không thể gửi dữ liệu lúc này.');
     }
 
@@ -146,6 +168,7 @@ form.addEventListener('submit', async (event) => {
     // happens after resetFormState has already cleared the old selections.
     pageShell.classList.add('success');
   } catch (error) {
+    alert('DEBUG - Lỗi bắt được: ' + error.name + ': ' + error.message);
     showError(error.message || 'Không thể gửi dữ liệu lúc này. Vui lòng thử lại sau.');
   } finally {
     stopLoading();
