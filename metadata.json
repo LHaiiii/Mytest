@@ -1,6 +1,6 @@
 {
-  "name": "Remix: Mytest",
-  "description": "Imported from GitHub: LHaiiii/Mytest",
+  "name": "Birthday Food Picker",
+  "description": "A survey and poll web app for selecting foods for a birthday party.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

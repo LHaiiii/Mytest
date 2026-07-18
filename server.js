@@ -67,19 +67,32 @@ app.get('/results', async (req, res) => {
         console.error('Error reading responses file:', err);
       }
     }
-    return res.json(records);
+
+    const normalized = records.map(row => ({
+      sender: row.sender || row.Sender || '',
+      selectedFoods: row.selectedFoods || row.SelectedFoods || [],
+      timestamp: row.timestamp || row.Timestamp || '',
+      source: row.source || row.Source || 'birthday-food-picker'
+    }));
+
+    return res.json(normalized);
   } catch (error) {
     console.error('Error in /results:', error);
     return res.status(500).json({ message: 'Không thể tải dữ liệu lúc này.' });
   }
 });
 
-// Root redirect matching the C# Program.cs behavior
+
 app.get('/', (req, res) => {
   res.redirect('/results.html');
 });
 
-// Serve static files from root directory
+
+app.get('/result.html', (req, res) => {
+  res.redirect('/results.html');
+});
+
+
 app.use(express.static(__dirname));
 
 app.listen(PORT, '0.0.0.0', () => {
