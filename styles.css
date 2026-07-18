@@ -1,13 +1,23 @@
+/* 
+  =========================================
+  THEME: Hand-Drawn Green Zine & Notebook
+  An indie, tactile, basic, and manual style
+  tailored for friends sharing birthday joy.
+  =========================================
+*/
+
 :root {
-  --bg: #f4fbf9;
-  --primary: #a7d7c5;
-  --primary-strong: #5c9e84;
-  --soft: #f0faf7;
-  --border: #e6f4f0;
-  --text: #333333;
-  --muted: #6c7a75;
-  --error: #ef6b6b;
-  --shadow: 0 8px 20px rgba(167, 215, 197, 0.35);
+  --ink-primary: #163226;
+  --ink-muted: #4e655a;
+  --paper-white: #ffffff;
+  --paper-bg: #f5faf7;
+  --tape-color: rgba(167, 215, 197, 0.75);
+  --green-accent: #48a679;
+  --green-active: #96eabf;
+  --green-light: #e6f7ef;
+  --yellow-highlight: #fff9c4;
+  --error-ink: #c24646;
+  --error-light: #fdf2f2;
 }
 
 * {
@@ -17,47 +27,113 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: radial-gradient(circle at top, #ffffff, var(--bg));
-  color: var(--text);
+  font-family: 'Quicksand', system-ui, -apple-system, sans-serif;
+  color: var(--ink-primary);
+  /* Retro hand-drawn gridded paper effect */
+  background-color: var(--paper-bg);
+  background-image: 
+    linear-gradient(rgba(215, 238, 228, 0.45) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(215, 238, 228, 0.45) 1.5px, transparent 1.5px);
+  background-size: 26px 26px;
+  background-position: center top;
 }
 
+/* Page shell grid centering */
 .page-shell {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 32px 16px;
 }
 
+/* 
+  Notebook / Zine Sheet layout 
+  Designed with irregular border-radii for hand-cut charm,
+  thick ink borders, and a solid offset physical shadow.
+*/
 .card {
-  width: min(100%, 680px);
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(167, 215, 197, 0.55);
-  border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 20px 60px rgba(92, 158, 132, 0.12);
-  backdrop-filter: blur(10px);
+  width: min(100%, 640px);
+  background: var(--paper-white);
+  border: 3px solid var(--ink-primary);
+  border-radius: 20px 14px 24px 16px;
+  padding: 40px 32px;
+  box-shadow: 6px 6px 0px var(--ink-primary);
+  position: relative;
+  overflow: visible;
+  transition: transform 0.3s ease;
+}
+
+/* 
+  Hand-applied Washi Tape effect at the top 
+  Gives it a "pasted poster" or scrap-journal feel.
+*/
+.card::before {
+  content: "";
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1.5deg);
+  width: 150px;
+  height: 36px;
+  background-color: var(--tape-color);
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,0.15),
+    rgba(255,255,255,0.15) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  border-left: 2px dashed rgba(22, 50, 38, 0.25);
+  border-right: 2px dashed rgba(22, 50, 38, 0.25);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Card corner staple sticker decorative element */
+.card::after {
+  content: "★";
+  font-size: 1.4rem;
+  color: var(--green-accent);
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  opacity: 0.85;
 }
 
 .eyebrow {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 12px;
-  color: var(--primary-strong);
+  letter-spacing: 2px;
+  font-size: 13px;
+  color: var(--green-accent);
   font-weight: 700;
+  font-family: 'Patrick Hand', cursive;
+  text-align: center;
 }
 
 h1 {
   margin: 0;
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-family: 'Patrick Hand', cursive;
+  font-size: clamp(2.1rem, 4vw, 2.8rem);
+  text-align: center;
+  color: var(--ink-primary);
+  line-height: 1.15;
+  letter-spacing: 0.5px;
 }
 
 .subtitle {
-  margin: 10px 0 24px;
-  color: var(--muted);
+  margin: 10px 0 32px;
+  color: var(--ink-muted);
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  border-bottom: 2px dashed var(--green-light);
+  padding-bottom: 20px;
 }
 
+/* Tactile options layout */
 .options-wrapper {
   display: grid;
   gap: 16px;
@@ -67,32 +143,39 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  justify-content: center;
 }
 
+/* 
+  Interactive Chips mimicking hand-made physical keys.
+  Click moves them downward into the surface (removing the flat shadow offset).
+*/
 .option-chip {
-  border: 1px solid var(--border);
-  background: #fff;
-  color: var(--text);
-  border-radius: 20px;
-  padding: 10px 14px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.25rem;
+  border: 2px solid var(--ink-primary);
+  background: var(--paper-white);
+  color: var(--ink-primary);
+  border-radius: 12px;
+  padding: 8px 18px;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-  transition: all 0.25s ease-out;
+  box-shadow: 3px 3px 0px var(--ink-primary);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.2s ease;
+  position: relative;
+  user-select: none;
 }
 
 .option-chip:hover {
-  transform: translateY(-2px);
-  background: var(--soft);
-  border-color: var(--primary);
-  box-shadow: var(--shadow);
+  background: var(--green-light);
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px var(--ink-primary);
 }
 
 .option-chip.active {
-  transform: scale(1.08);
-  background: #e1f5ee;
-  border-color: var(--primary-strong);
-  color: #1f4d3d;
+  background: var(--green-active);
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px var(--ink-primary);
   font-weight: 600;
 }
 
@@ -100,70 +183,93 @@ h1 {
   animation: pulse 0.18s ease;
 }
 
+/* Creative manual input launcher button */
 .add-chip {
-  min-width: 48px;
-  padding-inline: 12px;
+  min-width: 50px;
+  padding: 6px 14px;
+  background: #fdfbea;
+  border-style: dashed;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
+.add-chip:hover {
+  background: #fefad2;
+}
+
 .plus-sign {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   line-height: 1;
 }
 
+/* Custom food item field input styling */
 .custom-option-row {
   opacity: 0;
   max-height: 0;
   overflow: hidden;
-  transition: all 0.25s ease-out;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  margin-top: 4px;
 }
 
 .custom-option-row.show {
   opacity: 1;
   max-height: 120px;
+  margin-bottom: 8px;
 }
 
 .custom-input {
   width: 100%;
-  border: 1px solid var(--border);
+  border: 2px solid var(--ink-primary);
   border-radius: 12px;
   padding: 12px 14px;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: #fcfcf3;
+  box-shadow: inset 1px 1px 4px rgba(22, 50, 38, 0.08);
+  transition: all 0.2s ease;
 }
 
 .custom-input:focus {
-  border-color: var(--primary-strong);
-  box-shadow: 0 0 0 4px rgba(167, 215, 197, 0.28);
+  background: var(--paper-white);
+  border-color: var(--green-accent);
+  box-shadow: 3px 3px 0px var(--ink-primary);
 }
 
+/* Form groups and input fields */
 .field-group {
-  margin-top: 22px;
+  margin-top: 28px;
 }
 
 label {
   display: block;
   margin-bottom: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
 }
 
 input {
   width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 2px solid var(--ink-primary);
+  border-radius: 14px;
   padding: 14px 16px;
-  background: #fff;
+  background: var(--paper-white);
   outline: none;
+  font-family: inherit;
   font-size: 0.96rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: inset 1px 1px 4px rgba(22, 50, 38, 0.05);
+  transition: all 0.2s ease;
 }
 
 input:focus {
-  border-color: var(--primary-strong);
-  box-shadow: 0 0 0 4px rgba(167, 215, 197, 0.28);
+  border-color: var(--green-accent);
+  background-color: #fafcfb;
+  box-shadow: 3px 3px 0px var(--ink-primary);
 }
 
 .honeypot-field {
@@ -173,39 +279,57 @@ input:focus {
   pointer-events: none;
 }
 
+/* 
+  Submit Button
+  Thick cardboard look with satisfying interactive physical drop shadow.
+*/
 .submit-button {
-  margin-top: 24px;
-  border: none;
+  margin-top: 32px;
+  border: 2.5px solid var(--ink-primary);
   border-radius: 14px;
   width: 100%;
-  padding: 15px 18px;
-  background: var(--primary-strong);
-  color: #fff;
-  font-size: 1rem;
+  padding: 16px 20px;
+  background: var(--green-accent);
+  color: var(--paper-white);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.45rem;
   font-weight: 700;
+  letter-spacing: 0.8px;
   cursor: pointer;
   position: relative;
-  transition: background 0.3s ease, transform 0.2s ease, opacity 0.2s ease;
+  box-shadow: 4px 4px 0px var(--ink-primary);
+  transition: all 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.2);
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #4f8f74;
-  transform: translateY(-1px);
+  background: #53b98a;
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px var(--ink-primary);
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px var(--ink-primary);
 }
 
 .submit-button:disabled {
-  background: #b4c6bc;
+  background: #cbdcd5;
+  color: #799086;
+  border-color: #799086;
+  box-shadow: 2px 2px 0px #799086;
   cursor: not-allowed;
+  transform: translate(2px, 2px);
 }
 
 .spinner {
   display: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-top-color: #fff;
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: var(--paper-white);
   border-radius: 50%;
   margin-left: 10px;
+  vertical-align: middle;
   animation: spin 0.8s linear infinite;
 }
 
@@ -214,22 +338,35 @@ input:focus {
 }
 
 .submit-button.loading .button-text {
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
+/* Notifications and Error display */
 .message {
   min-height: 1.5em;
-  margin-top: 14px;
+  margin-top: 18px;
   font-weight: 600;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  transition: all 0.25s ease;
 }
 
 .message.error {
-  color: var(--error);
+  color: var(--error-ink);
+  background-color: var(--error-light);
+  border: 2px solid var(--error-ink);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.2rem;
 }
 
 .message.success {
-  color: var(--primary-strong);
-  font-size: 1.05rem;
+  color: var(--ink-primary);
+  background-color: var(--green-light);
+  border: 2.5px solid var(--ink-primary);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.4rem;
+  box-shadow: 3px 3px 0px var(--ink-primary);
 }
 
 .options-wrapper.error {
@@ -237,36 +374,171 @@ input:focus {
 }
 
 .options-wrapper.error .option-chip {
-  border-color: rgba(239, 107, 107, 0.7);
+  border-color: var(--error-ink);
+  background-color: var(--error-light);
 }
 
-/*
-  FIX: previously the whole <form> (including #message, which holds the
-  server's dynamic success text) was hidden with `display: none`, and a
-  hardcoded ::after string was shown instead. That meant the actual
-  message from the server was always thrown away and the user only ever
-  saw one fixed sentence.
-
-  Now we only hide the interactive controls the user no longer needs
-  (the option chips, the custom-add row, the name field, and the submit
-  button) and keep #message visible so whatever text showSuccess() sets
-  is what the user actually sees.
-*/
+/* Success layout (keeps the custom text visible cleanly) */
 .page-shell.success .options-wrapper,
 .page-shell.success .field-group,
 .page-shell.success .honeypot-field,
-.page-shell.success .submit-button {
+.page-shell.success .submit-button,
+.page-shell.success .results-link-wrapper {
   display: none;
 }
 
 .page-shell.success .message.success {
-  font-size: 1.15rem;
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 24px;
+  border-radius: 16px;
+  margin-top: 10px;
+}
+
+.success-actions {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.page-shell.success .success-actions {
+  display: flex;
+}
+
+.action-btn-manual {
+  display: block;
+  text-align: center;
+  border: 2px solid var(--ink-primary);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--ink-primary);
+  background: var(--green-active);
+  box-shadow: 3px 3px 0px var(--ink-primary);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.action-btn-manual:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px var(--ink-primary);
+  background: #a9f1cb;
+}
+
+.action-btn-manual:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px var(--ink-primary);
+}
+
+.action-btn-manual.secondary {
+  background: #fdfbea;
+}
+
+.action-btn-manual.secondary:hover {
+  background: #fefad2;
+}
+
+/* Cozy Friends results link footer */
+.results-link-wrapper {
+  margin-top: 28px;
   text-align: center;
 }
 
+.results-link {
+  display: inline-block;
+  color: var(--ink-primary);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.35rem;
+  text-decoration: none;
+  font-weight: 700;
+  border-bottom: 2px dashed var(--green-accent);
+  padding: 2px 6px;
+  transition: all 0.2s ease;
+}
+
+.results-link:hover {
+  color: var(--green-accent);
+  background-color: var(--yellow-highlight);
+  transform: rotate(-1deg) scale(1.05);
+}
+
+/* 
+  Table scroll container and retro manual ledger list 
+*/
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 2.5px solid var(--ink-primary);
+  border-radius: 12px;
+  background: var(--paper-white);
+  margin-top: 24px;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.results-table th, 
+.results-table td {
+  padding: 12px 14px;
+  border-bottom: 2px solid var(--ink-primary);
+  border-right: 1.5px solid var(--ink-primary);
+  text-align: left;
+}
+
+.results-table th:last-child, 
+.results-table td:last-child {
+  border-right: none;
+}
+
+.results-table tr:last-child td {
+  border-bottom: none;
+}
+
+.results-table th {
+  background: var(--green-light);
+  font-family: 'Patrick Hand', cursive;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  user-select: none;
+}
+
+/* Beautiful handdrawn style tags for food selections */
+.món-highlight {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.món-highlight span {
+  display: inline-block;
+  background: var(--yellow-highlight);
+  border: 1.5px solid var(--ink-primary);
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 1.5px 1.5px 0px var(--ink-primary);
+  transform: rotate(-0.5deg);
+}
+
+.món-highlight span:nth-child(even) {
+  background: #e8f9ee;
+  transform: rotate(0.8deg);
+}
+
+/* Animation presets */
 @keyframes pulse {
   0% { transform: scale(1); }
-  50% { transform: scale(0.98); }
+  50% { transform: scale(0.96); }
   100% { transform: scale(1); }
 }
 
@@ -284,6 +556,6 @@ input:focus {
 
 @media (max-width: 640px) {
   .card {
-    padding: 20px;
+    padding: 30px 20px;
   }
 }

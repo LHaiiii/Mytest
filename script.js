@@ -98,11 +98,8 @@ customOptionInput.addEventListener('keydown', (event) => {
   setTimeout(() => chip.classList.remove('pulse'), 180);
 });
 
-// PASTE URL WEB APP CỦA BẠN VÀO ĐÂY sau khi deploy Google Apps Script
-// (Deploy > New deployment > Web app > copy link kết thúc bằng /exec).
-// Đây là URL DUY NHẤT dùng cho cả gửi (POST) và xem kết quả (GET) —
-// Apps Script không có khái niệm đường dẫn /submit hay /results riêng.
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygW8cFzc7_655aOj9cHiSjSp2j9n_blOGRLTsM30di_YZIQksuOwiq0lO34osnXoqd/exec';
+// Endpoint dùng cho gửi (POST) và xem kết quả (GET) cục bộ trên server Node.js / Express
+const SUBMIT_URL = '/submit';
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -129,26 +126,17 @@ form.addEventListener('submit', async (event) => {
   };
 
   try {
-    const response = await fetch(APPS_SCRIPT_URL, {
+    const response = await fetch(SUBMIT_URL, {
       method: 'POST',
-      // FIX cho Apps Script: dùng 'text/plain' thay vì 'application/json'.
-      // Nếu để 'application/json', trình duyệt sẽ gửi kèm 1 request
-      // "preflight" (OPTIONS) trước — mà Apps Script không xử lý được,
-      // khiến request luôn thất bại với đúng lỗi "Failed to fetch".
-      // Gửi 'text/plain' tránh được preflight đó; Apps Script vẫn
-      // JSON.parse() được nội dung body bình thường.
       headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
     });
 
     const result = await response.json().catch(() => ({}));
 
-    // Apps Script luôn trả HTTP 200 dù thành công hay lỗi, nên không
-    // dùng response.ok để biết kết quả — phải đọc field "ok" trong JSON
-    // mà AppsScript.gs trả về.
-    if (!result.ok) {
+    if (!response.ok) {
       throw new Error(result.message || 'Không thể gửi dữ liệu lúc này.');
     }
 
@@ -206,4 +194,13 @@ function resetFormState() {
   customOptionInput.value = '';
   customOptionRow.classList.remove('show');
   customOptionRow.hidden = true;
+}
+
+const backToSurveyBtn = document.getElementById('backToSurveyBtn');
+if (backToSurveyBtn) {
+  backToSurveyBtn.addEventListener('click', () => {
+    pageShell.classList.remove('success');
+    messageEl.textContent = '';
+    messageEl.className = 'message';
+  });
 }

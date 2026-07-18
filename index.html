@@ -3,16 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Survey page</title>
+    <title>Birthday Food Picker</title>
+    <!-- Google Fonts for Hand-drawn / Sketch manual style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="page-shell">
       <section class="card">
-        <p class="eyebrow">Survey page</p>
+        <p class="eyebrow">Sinh nhật sắp đến rùi! 🎂</p>
         <h1>Bạn muốn ăn gì cho buổi sinh nhật này?</h1>
         <p class="subtitle">
-          Chọn những món yêu thích của bạn hoặc thêm món mới bằng dấu cộng.
+          Chọn những món yêu thích của bạn hoặc tự thêm món mới bằng dấu cộng.
         </p>
         <form id="choiceForm" novalidate>
           <div class="options-wrapper" id="optionsWrapper" aria-label="Lựa chọn món ăn">
@@ -37,8 +41,8 @@
             </div>
           </div>
           <div class="field-group">
-            <label for="contactInfo">Tên người gửi (nếu có)</label>
-            <input id="contactInfo" name="contactInfo" type="text" placeholder="Ví dụ: Lan, Huy, hoặc tên bạn" />
+            <label for="contactInfo">Tên bạn là gì nè?</label>
+            <input id="contactInfo" name="contactInfo" type="text" placeholder="Ví dụ: Lan, Huy, hoặc biệt danh của bạn" />
           </div>
           <!-- Honeypot: hidden from sighted users via CSS AND hidden from assistive
                tech via aria-hidden, so screen-reader users can never stumble into it. -->
@@ -47,10 +51,19 @@
             <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
           </div>
           <button id="submitButton" type="submit" class="submit-button">
-            <span class="button-text">Gửi lựa chọn</span>
+            <span class="button-text">Gửi lựa chọn cho chủ tiệc! 🚀</span>
             <span class="spinner" aria-hidden="true"></span>
           </button>
           <p id="message" class="message" aria-live="polite"></p>
+
+          <div class="success-actions" id="successActions">
+            <a href="/results.html" class="action-btn-manual">Xem ai đã chọn món gì nè 🏆</a>
+            <button type="button" id="backToSurveyBtn" class="action-btn-manual secondary">Gửi tiếp món khác 🍕</button>
+          </div>
+
+          <div class="results-link-wrapper">
+            <a href="/results.html" class="results-link">Xem bảng vàng chọn món 📝</a>
+          </div>
         </form>
       </section>
     </main>

@@ -3,59 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Birthday Food Results</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #f4fbf9;
-        margin: 0;
-        padding: 24px;
-      }
-      .container {
-        max-width: 900px;
-        margin: auto;
-        background: #fff;
-        padding: 24px;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
-      th, td {
-        border: 1px solid #d8ebe3;
-        padding: 10px;
-        text-align: left;
-      }
-      th {
-        background: #e1f5ee;
-      }
-      h1 {
-        color: #417b63;
-      }
-      .load-error {
-        color: #b23b3b;
-        font-weight: 600;
-      }
-    </style>
+    <title>Danh sách món ăn - Sinh nhật</title>
+    <!-- Google Fonts for Hand-drawn / Sketch manual style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="container">
-      <h1>Danh sách món đã được chọn</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Người gửi</th>
-            <th>Món đã chọn</th>
-            <th>Thời gian</th>
-            <th>Nguồn</th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody"></tbody>
-      </table>
-    </div>
+    <main class="page-shell">
+      <section class="card">
+        <p class="eyebrow">Bảng vàng ăn uống 🏆</p>
+        <h1>Ai muốn ăn món gì nè?</h1>
+        <p class="subtitle">
+          Danh sách món do đám bạn thân đã gửi để cùng ăn mừng sinh nhật.
+        </p>
+
+        <div class="table-scroll-wrapper">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Người gửi 👤</th>
+                <th>Món đã chọn 🍕</th>
+                <th>Thời gian ⏰</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="results-link-wrapper" style="margin-top: 24px;">
+          <a href="/index.html" class="results-link">↩ Quay lại chọn món ngay thui!</a>
+        </div>
+      </section>
+    </main>
     <script>
       // FIX: rows from the server can contain a "sender" name or a custom
       // food item that the original survey page let a visitor type freely
@@ -73,13 +54,12 @@
           .replaceAll("'", '&#39;');
       }
 
-      // Dùng CHÍNH XÁC cùng 1 URL Web App bạn dán trong script.js.
-      // Apps Script tự biết trả kết quả (doGet) vì đây là request GET.
-      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygW8cFzc7_655aOj9cHiSjSp2j9n_blOGRLTsM30di_YZIQksuOwiq0lO34osnXoqd/exec';
+      // Dùng endpoint cục bộ trên server Node.js / Express
+      const RESULTS_URL = '/results';
 
       async function loadResults() {
         const tbody = document.getElementById('resultsBody');
-        const resultUrl = APPS_SCRIPT_URL;
+        const resultUrl = RESULTS_URL;
 
         try {
           const response = await fetch(resultUrl);
@@ -91,25 +71,42 @@
           const rows = await response.json();
 
           if (!rows.length) {
-            tbody.innerHTML = '<tr><td colspan="4">Chưa có dữ liệu nào.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px;">Chưa có ai chọn cả, bạn mở bát đi! 🍽️</td></tr>';
             return;
           }
 
           // FIX: every field that can contain free-typed user input is
           // passed through escapeHtml() before being inserted.
-          tbody.innerHTML = rows.map((row) => `
-            <tr>
-              <td>${escapeHtml(row.sender || 'Không có tên')}</td>
-              <td>${(row.selectedFoods || []).map(escapeHtml).join(', ')}</td>
-              <td>${escapeHtml(row.timestamp || '')}</td>
-              <td>${escapeHtml(row.source || '')}</td>
-            </tr>
-          `).join('');
+          tbody.innerHTML = rows.map((row) => {
+            let formattedTime = '';
+            try {
+              if (row.timestamp) {
+                const d = new Date(row.timestamp);
+                formattedTime = d.toLocaleDateString('vi-VN', {
+                  month: 'numeric',
+                  day: 'numeric'
+                }) + ' ' + d.toLocaleTimeString('vi-VN', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+              }
+            } catch (e) {
+              formattedTime = row.timestamp || '';
+            }
+
+            return `
+              <tr>
+                <td style="font-weight: 600; color: #163226;">${escapeHtml(row.sender || 'Ẩn danh 🤫')}</td>
+                <td><span class="món-highlight">${(row.selectedFoods || []).map(escapeHtml).map(food => `<span>${food}</span>`).join('')}</span></td>
+                <td style="font-size: 0.85rem; color: #6c7a75;">${escapeHtml(formattedTime)}</td>
+              </tr>
+            `;
+          }).join('');
         } catch (error) {
           // FIX: previously a failed fetch (server down, CORS, bad JSON,
           // non-2xx status) threw silently into the console and the table
           // just stayed empty with no explanation. Now the user sees why.
-          tbody.innerHTML = `<tr><td colspan="4" class="load-error">Không tải được dữ liệu: ${escapeHtml(error.message)}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="3" class="load-error">Không tải được dữ liệu: ${escapeHtml(error.message)}</td></tr>`;
         }
       }
 

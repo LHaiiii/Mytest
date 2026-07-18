@@ -1,0 +1,16 @@
+{
+  "name": "birthday-food-picker",
+  "version": "1.0.0",
+  "description": "Survey page for birthday foods",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'No build step required'",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
