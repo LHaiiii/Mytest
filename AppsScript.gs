@@ -33,8 +33,18 @@ function doPost(e) {
   }
 }
 
+// ĐỔI chuỗi này thành mật khẩu bí mật CỦA RIÊNG BẠN trước khi deploy.
+// Chỉ ai biết đúng mã này mới xem được kết quả — không liên quan gì tới
+// việc gửi khảo sát (doPost vẫn mở cho tất cả mọi người như cũ).
+const SECRET_KEY = '123456789';
+
 // Được gọi khi trang kết quả (results.html) GET dữ liệu về.
 function doGet(e) {
+  const providedKey = e.parameter.key || '';
+  if (providedKey !== SECRET_KEY) {
+    return jsonResponse_({ ok: false, message: 'Sai mật khẩu hoặc không có quyền truy cập.' });
+  }
+
   const sheet = getSheet_();
   const values = sheet.getDataRange().getValues();
 
@@ -48,7 +58,7 @@ function doGet(e) {
     };
   });
 
-  return jsonResponse_(rows);
+  return jsonResponse_({ ok: true, rows: rows });
 }
 
 // Lấy sheet "Submissions", tự tạo mới kèm header nếu chưa có.

@@ -19,32 +19,35 @@
           Danh sách món do đám bạn thân đã gửi để cùng ăn mừng sinh nhật.
         </p>
 
-        <div class="table-scroll-wrapper">
-          <table class="results-table">
-            <thead>
-              <tr>
-                <th>Người gửi 👤</th>
-                <th>Món đã chọn 🍕</th>
-                <th>Thời gian ⏰</th>
-              </tr>
-            </thead>
-            <tbody id="resultsBody"></tbody>
-          </table>
+        <div id="passcodeGate" class="field-group">
+          <label for="passcodeInput">Nhập mật khẩu để xem kết quả</label>
+          <input id="passcodeInput" type="password" placeholder="Mật khẩu bí mật của bạn" autocomplete="off" />
+          <button type="button" id="passcodeSubmit" class="submit-button" style="margin-top: 12px;">Xem kết quả</button>
+          <p id="passcodeMessage" class="message" aria-live="polite"></p>
         </div>
 
-        <div class="results-link-wrapper" style="margin-top: 24px;">
-          <a href="/index.html" class="results-link">↩ Quay lại chọn món ngay thui!</a>
+        <div id="resultsSection" hidden>
+          <div class="table-scroll-wrapper">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Người gửi 👤</th>
+                  <th>Món đã chọn 🍕</th>
+                  <th>Thời gian ⏰</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+
+          <div class="results-link-wrapper" style="margin-top: 24px;">
+            <a href="index.html" class="results-link">↩ Quay lại chọn món ngay thui!</a>
+          </div>
         </div>
       </section>
     </main>
     <script>
-      // FIX: rows from the server can contain a "sender" name or a custom
-      // food item that the original survey page let a visitor type freely
-      // (see script.js). Anything user-supplied must be escaped before it
-      // goes into innerHTML, otherwise a value like
-      // "<img src=x onerror=alert(1)>" typed as a food name would execute
-      // as real HTML/JS on this results page. escapeHtml() neutralizes the
-      // characters that matter for that: & < > " '
+
       function escapeHtml(value) {
         return String(value)
           .replaceAll('&', '&amp;')
@@ -54,63 +57,99 @@
           .replaceAll("'", '&#39;');
       }
 
-      // Dùng endpoint cục bộ trên server Node.js / Express
-      const RESULTS_URL = '/results';
+      const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygW8cFzc7_655aOj9cHiSjSp2j9n_blOGRLTsM30di_YZIQksuOwiq0lO34osnXoqd/exec';
 
-      async function loadResults() {
-        const tbody = document.getElementById('resultsBody');
-        const resultUrl = RESULTS_URL;
+      const passcodeGate = document.getElementById('passcodeGate');
+      const passcodeInput = document.getElementById('passcodeInput');
+      const passcodeSubmit = document.getElementById('passcodeSubmit');
+      const passcodeMessage = document.getElementById('passcodeMessage');
+      const resultsSection = document.getElementById('resultsSection');
+
+      const savedKey = sessionStorage.getItem('resultsPasscode');
+      if (savedKey) {
+        tryLoadResults(savedKey);
+      }
+
+      passcodeSubmit.addEventListener('click', () => {
+        const key = passcodeInput.value.trim();
+        if (!key) {
+          passcodeMessage.textContent = 'Bạn nhập mật khẩu đã nhé.';
+          passcodeMessage.className = 'message error';
+          return;
+        }
+        tryLoadResults(key);
+      });
+
+      passcodeInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          passcodeSubmit.click();
+        }
+      });
+
+      async function tryLoadResults(key) {
+        passcodeMessage.textContent = 'Đang kiểm tra...';
+        passcodeMessage.className = 'message';
+
+        const url = `${APPS_SCRIPT_URL}?key=${encodeURIComponent(key)}`;
 
         try {
-          const response = await fetch(resultUrl);
-
+          const response = await fetch(url);
           if (!response.ok) {
             throw new Error(`Server trả về lỗi ${response.status}`);
           }
 
-          const rows = await response.json();
+          const data = await response.json();
 
-          if (!rows.length) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px;">Chưa có ai chọn cả, bạn mở bát đi! 🍽️</td></tr>';
+          if (!data.ok) {
+            sessionStorage.removeItem('resultsPasscode');
+            passcodeMessage.textContent = data.message || 'Sai mật khẩu, bạn thử lại nhé.';
+            passcodeMessage.className = 'message error';
             return;
           }
 
-          // FIX: every field that can contain free-typed user input is
-          // passed through escapeHtml() before being inserted.
-          tbody.innerHTML = rows.map((row) => {
-            let formattedTime = '';
-            try {
-              if (row.timestamp) {
-                const d = new Date(row.timestamp);
-                formattedTime = d.toLocaleDateString('vi-VN', {
-                  month: 'numeric',
-                  day: 'numeric'
-                }) + ' ' + d.toLocaleTimeString('vi-VN', {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                });
-              }
-            } catch (e) {
-              formattedTime = row.timestamp || '';
-            }
-
-            return `
-              <tr>
-                <td style="font-weight: 600; color: #163226;">${escapeHtml(row.sender || 'Ẩn danh 🤫')}</td>
-                <td><span class="món-highlight">${(row.selectedFoods || []).map(escapeHtml).map(food => `<span>${food}</span>`).join('')}</span></td>
-                <td style="font-size: 0.85rem; color: #6c7a75;">${escapeHtml(formattedTime)}</td>
-              </tr>
-            `;
-          }).join('');
+          sessionStorage.setItem('resultsPasscode', key);
+          passcodeGate.hidden = true;
+          resultsSection.hidden = false;
+          renderResults(data.rows || []);
         } catch (error) {
-          // FIX: previously a failed fetch (server down, CORS, bad JSON,
-          // non-2xx status) threw silently into the console and the table
-          // just stayed empty with no explanation. Now the user sees why.
-          tbody.innerHTML = `<tr><td colspan="3" class="load-error">Không tải được dữ liệu: ${escapeHtml(error.message)}</td></tr>`;
+          passcodeMessage.textContent = 'Không kiểm tra được lúc này: ' + error.message;
+          passcodeMessage.className = 'message error';
         }
       }
 
-      loadResults();
+      function renderResults(rows) {
+        const tbody = document.getElementById('resultsBody');
+
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px;">Chưa có ai chọn cả, bạn mở bát đi! 🍽️</td></tr>';
+          return;
+        }
+        tbody.innerHTML = rows.map((row) => {
+          let formattedTime = '';
+          try {
+            if (row.timestamp) {
+              const d = new Date(row.timestamp);
+              formattedTime = d.toLocaleDateString('vi-VN', {
+                month: 'numeric',
+                day: 'numeric'
+              }) + ' ' + d.toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            }
+          } catch (e) {
+            formattedTime = row.timestamp || '';
+          }
+
+          return `
+            <tr>
+              <td style="font-weight: 600; color: #163226;">${escapeHtml(row.sender || 'Ẩn danh 🤫')}</td>
+              <td><span class="món-highlight">${(row.selectedFoods || []).map(escapeHtml).map(food => `<span>${food}</span>`).join('')}</span></td>
+              <td style="font-size: 0.85rem; color: #6c7a75;">${escapeHtml(formattedTime)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
     </script>
   </body>
 </html>
